@@ -13,3 +13,14 @@ ISP        RTC<br>
 5 SDA<br>
 6 SCL<br>
 
+
+## IGUALAR HORA CON SERVIDOR NTP
+
+Es necesario hacer una conexión UDP a un servidor de la siguiente lista
+
+https://tf.nist.gov/tf-cgi/servers.cgi
+
+por el puerto 123. Luego de establecida la conexión se envía un buffer de 48 ceros (sin CR ni LF) y se procesa la respuesta.
+
+
+
