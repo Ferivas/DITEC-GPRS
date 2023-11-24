@@ -8,7 +8,7 @@
 '
 
 
-$version 0 , 1 , 170
+$version 0 , 1 , 186
 $regfile = "m1284pdef.dat"
 $crystal = 7372800
 $baud = 9600
@@ -19,7 +19,7 @@ $hwstack = 256
 $swstack = 256
 $framesize = 256
 
-$projecttime = 36
+$projecttime = 42
 
 
 'CONSTANTES
@@ -123,7 +123,7 @@ Enable Interrupts
 '*******************************************************************************
 '* Archivos incluidos
 '*******************************************************************************
-$include "DITEC_archivos.bas"
+$include "DITEC_kite_archivos.bas"
 
 
 
@@ -229,10 +229,10 @@ Do
             Txok = 0
             Cntrtx = 0
             Do
-               Call Vergprs()
-               If Gprsok = 1 Then
+               'Call Vergprs()
+               'If Gprsok = 1 Then
                   Call Txdata(1)
-               End If
+               'End If
                Incr Cntrtx
             Loop Until Txok = 1 Or Cntrtx = 2
             If Txok = 1 Then
@@ -250,10 +250,10 @@ Do
          Txok = 0
          Cntrtx = 0
          Do
-            Call Vergprs()
-            If Gprsok = 1 Then
+            'Call Vergprs()
+            'If Gprsok = 1 Then
                Call Txdata(0)
-            End If
+            'End If
             Incr Cntrtx
          Loop Until Txok = 1 Or Cntrtx = 2
       End If
@@ -266,6 +266,7 @@ Do
       If Fallagprs = 1 Then
          Reset Fallagprs
          Print #1 , "<+PDP: DEACT> detectado"
+         Reset Cifsrok
       End If
 
       If Iniauto.0 = 1 Then
@@ -279,11 +280,11 @@ Do
             Txok = 0
             Cntrtx = 0
             Do
-               Call Vergprs()
-               If Gprsok = 1 Then
+               'Call Vergprs()
+               'If Gprsok = 1 Then
                   Print #1 , "CNTRtx=" ; Cntrtx
                   Call Txdata(1)
-               End If
+               'End If
                Incr Cntrtx
             Loop Until Txok = 1 Or Cntrtx = 2
             If Txok = 1 Then

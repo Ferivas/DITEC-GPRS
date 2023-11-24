@@ -7,3 +7,9 @@ BASCOM/DITEC_main.dbg
 BASCOM/DITEC_main.hex
 BASCOM/DITEC_main.obj
 BASCOM/DITEC_main.rpt
+*.bm
+*.cfg
+*.dbg
+*.obj
+*.rpt
+*.TXT

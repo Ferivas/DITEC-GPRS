@@ -9,7 +9,7 @@
 
 $nocompile
 
-$projecttime = 47
+$projecttime = 93
 '*******************************************************************************
 'Declaracion de subrutinas
 '*******************************************************************************
@@ -42,12 +42,14 @@ Declare Sub Settimeds3231()
 Declare Sub Leeradc()
 Declare Sub Apagarmdm()
 Declare Sub Leertc()
+Declare Sub Getip()
 
 
 '*******************************************************************************
 'Declaracion de variables
 '*******************************************************************************
 Dim Tmpb As Byte , Tmpb2 As Byte , Tmpb3 As Byte , K As Byte
+Dim Tmpb4 As Byte
 Dim Jed As Byte , J As Byte
 Dim Tmpl As Long , Tmpl2 As Long , Tmplisr As Long , Lsyssec As Long
 Dim Tmpw As Word
@@ -1094,6 +1096,141 @@ Sub Procser()
             Tmpbit = Ed3 Xor Edpol.3
             Atsnd = Atsnd + ", ED4=" + Str(tmpbit)
 
+         Case "SETPAR"
+            If Numpar = 5 Then
+               Tmpb = Val(cmdsplit(2))
+               Tmpb2 = Val(cmdsplit(3))
+               Tmpb3 = Val(cmdsplit(4))
+
+               Select Case Tmpb
+                  Case 1:                                   ' ED
+                     If Tmpb2 > 0 And Tmpb2 < Ednum_masuno Then
+                        Select Case Tmpb3
+                           Case 1:                          'Nombre
+                              Edname(tmpb2) = Cmdsplit(5)
+                              Ednameeep(tmpb2) = Edname(tmpb2)
+                              Cmderr = 0
+                              Atsnd = "Se config nombre ED" + Str(tmpb2) + "=" + Edname(tmpb2)
+
+                           Case 2:                          ' Polaridad
+                              Tmpb4 = Val(cmdsplit(5))
+                              If Tmpb4 < 2 Then
+                                 J = Tmpb2 - 1
+                                 If Tmpb4 = 0 Then
+                                    Reset Edpol.j
+                                 Else
+                                    Set Edpol.j
+                                 End If
+                                 Edpoleep = Edpol
+                                 Cmderr = 0
+                                 Atsnd = "EDpol" + Str(tmpb2) + "=" + Str(edpol.j)
+                              Else
+                                 Cmderr = 0
+                                 Atsnd = "Valor de polaridad no valido"
+                              End If
+
+                           Case 3:                          ' Tactivacion +
+                              Tredmas(tmpb2) = Val(cmdsplit(5))
+                              Tredmaseep(tmpb2) = Tredmas(tmpb2)
+                              Cmderr = 0
+                              Atsnd = "Se config Tactivacion + ED" + Str(tmpb2) + "=" + Str(tredmas(tmpb2)) + "x100 ms"
+
+                           Case 4:                          'T activacion -
+                              Tredmenos(tmpb2) = Val(cmdsplit(5))
+                              Tredmenoseep(tmpb2) = Tredmenos(tmpb2)
+                              Cmderr = 0
+                              Atsnd = "Se config Tactivacion - ED" + Str(tmpb2) + "=" + Str(tredmenos(tmpb2)) + "x100 ms"
+
+
+                           Case Else
+                              Cmderr = 0
+                              Atsnd = "Parametro ED no valido"
+
+                        End Select
+                     Else
+                        Cmderr = 0
+                        Atsnd = "Num ED no valido"
+                     End If
+
+                  Case 2:                                   'EA
+                     Cmderr = 0
+                     Atsnd = "EA no hab en esta version"
+'                     If Tmpb2 > 0 And Tmpb2 < Eanum_masuno Then
+'                        Select Case Tmpb3
+'                           Case 1:                          'Nombre
+'                              Eaname(tmpb2) = Cmdsplit(5)
+'                              Eanameeep(tmpb2) = Eaname(tmpb2)
+'                              Cmderr = 0
+'                              Atsnd = "Se config nombre EA" + Str(tmpb2) + "=" + Eaname(tmpb2)
+
+'                           Case 2:                          ' Inicio de escala
+'                              Iniescala(tmpb2) = Val(cmdsplit(5))
+'                              Iniescalaeep(tmpb2) = Iniescala(tmpb2)
+'                              Cmderr = 0
+'                              Atsnd = "Inicio escala EA" + Str(tmpb2) + "=" + Str(iniescala(tmpb2))
+
+'                           Case 3:                          ' Fondo de escala
+'                              Fondoescala(tmpb2) = Val(cmdsplit(5))
+'                              Fondoescalaeep(tmpb2) = Fondoescala(tmpb2)
+'                              Cmderr = 0
+'                              Atsnd = "Fondo escala EA" + Str(tmpb2) + "=" + Str(fondoescala(tmpb2))
+
+'                           Case Else
+'                              Cmderr = 0
+'                              Atsnd = "Parametro EA no valido"
+
+'                        End Select
+'                     Else
+'                        Cmderr = 5
+'                     End If
+
+'                  Case 3:                                   'MODBUS
+'                     Cmderr = 0
+'                     Atsnd = "MODBUS no implementado en esta version"
+
+                  Case Else:
+                     Cmderr = 0
+                     Atsnd = "Tipo de entrada incorrecto"
+
+               End Select
+
+            Else
+               Cmderr = 4
+            End If
+
+         Case "LEEPAR"
+            If Numpar = 3 Then
+               Tmpb = Val(cmdsplit(2))
+               Tmpb2 = Val(cmdsplit(3))
+               Select Case Tmpb
+                  Case 1:
+                     Cmderr = 0                             'ED
+                     If Tmpb2 > 0 And Tmpb2 < Ednum_masuno Then
+                        J = Tmpb2 - 1
+                        Atsnd = "ED" + Str(tmpb2) + ";Nombre=" + Edname(tmpb2) + ";POL=" + Str(edpol.j) + ";Tact+=" + Str(tredmas(tmpb2)) + "x100ms ;Tact-=" + Str(tredmenos(tmpb2)) + "x100ms"
+                     Else
+                        Cmderr = 0
+                        Atsnd = "Num ED no valido"
+                     End If
+
+                  Case 2:                                   ' EA
+                     Cmderr = 0                             'ED
+                     Atsnd = "EA no hab en esta version"
+'                     If Tmpb2 > 0 And Tmpb2 < Eanum_masuno Then
+'                        Atsnd = "EA" + Str(tmpb2) + ";Nombre=" + Eaname(tmpb2) + ";Iniescala=" + Str(iniescala(tmpb2)) + ";Fondoescala=" + Str(fondoescala(tmpb2))
+'                     Else
+'                        Cmderr = 0
+'                        Atsnd = "Num ED no valido"
+'                     End If
+
+'                  Case 3:                                      'MODBUS
+
+
+               End Select
+            Else
+               Cmderr = 4
+            End If
+
          Case "INIMDM"
             If Numpar = 2 Then
                Cmderr = 0
@@ -1810,14 +1947,8 @@ Sub Genjsonts()
    Call Sendtrans()
 End Sub
 
-'*******************************************************************************
-'TX DATOS GPRS
-'*******************************************************************************
-Sub Txdata(byval Trama As Byte)
-   Estado_led = 8
-   Reset Txok
-   Print #1,
-   Print #1 , "Ini TX"
+
+Sub Getip()
    Print #1 , "Sinc MTCP"
    Tf_error = 0
    Gprstxsta = "NO TX"
@@ -1837,7 +1968,6 @@ Sub Txdata(byval Trama As Byte)
    Loop Until Atok = 1 Or Pwrctl = 0 Or Tf_error > 10
 
    If Atok = 1 Then
-
       Print #1 , "Cierra conexiones anteriores"
       Reset T1tout
       T1cntr = 0
@@ -1852,9 +1982,6 @@ Sub Txdata(byval Trama As Byte)
       Print #1 , "2: " ; At_resp
       Print #1 , "3: " ; At_data
       Print #1 , "4: " ; At_data1
-
-
-
       Tf_error = 0
       Reset Csttok
       Call Atcmdsnd( "AT+CIFSR" , 500)
@@ -1941,7 +2068,6 @@ Sub Txdata(byval Trama As Byte)
             Print #1 , "2: " ; At_resp
             Print #1 , "3: " ; At_data
             Print #1 , "4: " ; At_data1
-
          End If
          If Ciicrok = 1 Then
             Reset Cifsrok
@@ -1960,210 +2086,207 @@ Sub Txdata(byval Trama As Byte)
             End If
          End If
       End If
-
-      If Cifsrok = 1 Then
-         Reset Inicon
-         Tmpb2 = 0
-         Tmpstr52 = "AT+CIPSTART=" + Chr(34) + "TCP" + Chr(34) + "," + Chr(34) + Iptx + Chr(34) + "," + Chr(34) + Prtotx + Chr(34)
-         Call Atcmdsnd(tmpstr52 , 500)
-         Print #1 , "1: " ; At_loop
-         Print #1 , "2: " ; At_resp
-         Print #1 , "3: " ; At_data
-         Print #1 , "4: " ; At_data1
-         At_loop = ""
-         At_resp = ""
-         At_data = ""
-         At_data1 = ""
-
-         Reset T1tout
-         T1cntr = 0
-         T1wait = 40
-         Set T1ini
-         Print #1 , "Espera conexion"
-         Do
-            Reset Watchdog
-         Loop Until Inicon = 1 Or T1tout = 1
-         Print #1 , "1: " ; At_loop
-         Print #1 , "2: " ; At_resp
-         Print #1 , "3: " ; At_data
-         Print #1 , "4: " ; At_data1
-         If Inicon = 1 Then
-            Reset Initx
-            Tmpstr52 = "AT+CIPSEND?"
-            Call Atcmdsnd(tmpstr52 , 200)
-            Print #1 , "1: " ; At_loop
-            Print #1 , "2: " ; At_resp
-            Print #1 , "3: " ; At_data
-            Print #1 , "4: " ; At_data1
-            Tmpstr52 = "AT+CIPSEND"
-            Call Atcmdsnd(tmpstr52 , 40)
-            Reset T1tout
-            T1cntr = 0
-            T1wait = 15
-            Set T1ini
-            Do
-               Reset Watchdog
-            Loop Until Initx = 1 Or T1tout = 1
-            Print #1 , "1: " ; At_loop
-            Print #1 , "2: " ; At_resp
-            Print #1 , "3: " ; At_data
-            Print #1 , "4: " ; At_data1
-            If Initx = 1 Then
-               Reset Initx
-               If Trama = 0 Then                            ' WATCHING SERVER
-                  Call Sendtrans()
-               End If
-               If Trama = 1 Then                            ' WATCHING SERVER
-                  Call Genjsonts()
-               End If
-
-
-               Reset Sendok
-               Reset Respsrvok
-               Set Newrd
-               Print #1 , Chr(26);
-               Print #2 , Chr(26);
-               At_loop = ""
-               At_resp = ""
-               At_data = ""
-               At_data1 = ""
-
-               Reset T1tout
-               T1cntr = 0
-               T1wait = 20
-               Set T1ini
-               Do
-                  Reset Watchdog
-               Loop Until At_loop <> "" Or At_resp <> "" Or At_data <> "" Or At_data1 <> "" Or T1tout = 1 Or Sendok = 1       ' Or Sendfail = 1
-               Reset T1tout
-               Print #1 , "1: " ; At_loop
-               Print #1 , "2: " ; At_resp
-               Print #1 , "3: " ; At_data
-               Print #1 , "4: " ; At_data1
-
-               Print #1 , "Espera respuesta server"
-
-               Reset T1tout
-               T1cntr = 0
-               T1wait = 6
-               Set T1ini
-               Do
-               Loop Until Respsrvok = 1 Or T1tout = 1
-               Print #1 , "FIN ESPERA"
-
-               Reset T1tout
-               T1cntr = 0
-               T1wait = 10
-               Set T1ini
-               Print #1 , "Close"
-               Reset Closeok
-               Call Atcmdsnd( "AT+CIPCLOSE" , 100)
-               Call Espera(100)
-
-               Do
-               Loop Until Closeok = 1 Or T1tout = 1         'Or Dcdgsm = 1
-               Print #1 , "1: " ; At_loop
-               Print #1 , "2: " ; At_resp
-               Print #1 , "3: " ; At_data
-               Print #1 , "4: " ; At_data1
-
-               Print #1 , "Bye"
-               If Closeok = 1 Then
-                  Print #1 , "CLOSE OK"
-               Else
-                  Reset T1tout
-                  Print #1 , "NO CLOSE OK rx"
-                  Reset T1tout
-                  T1cntr = 0
-                  T1wait = 10
-                  Set T1ini
-                  Reset Shutok
-                  Do
-                     Call Atcmdsnd( "AT+CIPSHUT" , 100)
-                     Call Espera(100)
-                  Loop Until Shutok = 1 Or T1tout = 1    'Or Dcdgsm = 1
-                  Print #1 , "1: " ; At_loop
-                  Print #1 , "2: " ; At_resp
-                  Print #1 , "3: " ; At_data
-                  Print #1 , "4: " ; At_data1
-               End If
-
-
-
-               If Ptrrd > 1 Then
-                  Print #1 , "BUFRD"
-                  For Tmpw = 1 To Ptrrd
-                     Print #1 , Chr(bufrd(tmpw));
-                  Next
-                  Print #1,
-                  Print #1 , "%FINBUFRD%"
-                  Tmpw = Instr(bufferrx , "Status: 200 OK")
-                  If Tmpw > 0 Then
-                     Print #1 , "TS WR OK"
-                     Cntrerrts = 0
-                  Else
-                     Incr Cntrerrts
-                     If Cntrerrts = 6 Then
-                        Set Iniapagarmdm
-
-                     End If
-                  End If
-
-               End If
-
-               Ptrrd = 0
-               Reset Newrd
-               Set Txok
-               Cntracterr = 0
-               Cntrerrtx = 0
-               Reset T1ini
-               Estado_led = 1
-            Else
-               Print #1 , "Error TX"
-               Incr Cntrerrtx
-            End If
-         Else
-            Print #1 , "No se pudo establecer conexión con el servidor"
-            Print #1 , "Reset sesion IP"
-            Reset T1tout
-            Incr Cntrerrtx
-            T1cntr = 0
-            T1wait = 10
-            Set T1ini
-            Reset Shutok
-            Do
-               Call Atcmdsnd( "AT+CIPSHUT" , 100)
-               Call Espera(100)
-            Loop Until Shutok = 1 Or T1tout = 1    'Or Dcdgsm = 1
-            Print #1 , "1: " ; At_loop
-            Print #1 , "2: " ; At_resp
-            Print #1 , "3: " ; At_data
-            Print #1 , "4: " ; At_data1
-            Estado_led = 2
-         End If
-      Else
-         Print #1 , "Falla en levantar GPRS"
-            Print #1 , "Reset sesion IP"
-            Incr Cntrerrtx
-            Reset T1tout
-            T1cntr = 0
-            T1wait = 10
-            Set T1ini
-            Reset Shutok
-            Do
-               Call Atcmdsnd( "AT+CIPSHUT" , 100)
-               Call Espera(100)
-            Loop Until Shutok = 1 Or T1tout = 1    'Or Dcdgsm = 1
-            Print #1 , "1: " ; At_loop
-            Print #1 , "2: " ; At_resp
-            Print #1 , "3: " ; At_data
-            Print #1 , "4: " ; At_data1
-            Estado_led = 2
-      End If
    Else
       Print #1 , "No SINC M"
       Gprstxsta = "NO MDM"
       Set Inimodem
+   End If
+
+End Sub
+
+
+'*******************************************************************************
+'TX DATOS GPRS
+'*******************************************************************************
+Sub Txdata(byval Trama As Byte)
+   Estado_led = 8
+   Reset Txok
+   Print #1,
+   Print #1 , "Ini TX"
+   Print #1 , "Ver IP"
+   If Cifsrok = 0 Then
+      Call Getip()
+      If Cifsrok = 0 Then
+         Print #1 , "Err por IP fail"
+         Print #1 , "Cntrerrtx=";Cntrerrtx
+         Incr Cntrerrtx
+      Else
+         Cntrerrtx = 0
+      End If
+   Else
+      Reset Inicon
+      Tmpb2 = 0
+      Tmpstr52 = "AT+CIPSTART=" + Chr(34) + "TCP" + Chr(34) + "," + Chr(34) + Iptx + Chr(34) + "," + Chr(34) + Prtotx + Chr(34)
+      Call Atcmdsnd(tmpstr52 , 500)
+      Print #1 , "1: " ; At_loop
+      Print #1 , "2: " ; At_resp
+      Print #1 , "3: " ; At_data
+      Print #1 , "4: " ; At_data1
+      At_loop = ""
+      At_resp = ""
+      At_data = ""
+      At_data1 = ""
+
+      Reset T1tout
+      T1cntr = 0
+      T1wait = 40
+      Set T1ini
+      Print #1 , "Espera conexion"
+      Do
+         Reset Watchdog
+      Loop Until Inicon = 1 Or T1tout = 1
+      Print #1 , "1: " ; At_loop
+      Print #1 , "2: " ; At_resp
+      Print #1 , "3: " ; At_data
+      Print #1 , "4: " ; At_data1
+      If Inicon = 1 Then
+         Reset Initx
+         Tmpstr52 = "AT+CIPSEND?"
+         Call Atcmdsnd(tmpstr52 , 200)
+         Print #1 , "1: " ; At_loop
+         Print #1 , "2: " ; At_resp
+         Print #1 , "3: " ; At_data
+         Print #1 , "4: " ; At_data1
+         Tmpstr52 = "AT+CIPSEND"
+         Call Atcmdsnd(tmpstr52 , 40)
+         Reset T1tout
+         T1cntr = 0
+         T1wait = 15
+         Set T1ini
+         Do
+            Reset Watchdog
+         Loop Until Initx = 1 Or T1tout = 1
+         Print #1 , "1: " ; At_loop
+         Print #1 , "2: " ; At_resp
+         Print #1 , "3: " ; At_data
+         Print #1 , "4: " ; At_data1
+         If Initx = 1 Then
+            Reset Initx
+            If Trama = 0 Then                            ' WATCHING SERVER
+               Call Sendtrans()
+            End If
+            If Trama = 1 Then                            ' WATCHING SERVER
+               Call Genjsonts()
+            End If
+            Reset Sendok
+            Reset Respsrvok
+            Set Newrd
+            Print #1 , Chr(26);
+            Print #2 , Chr(26);
+            At_loop = ""
+            At_resp = ""
+            At_data = ""
+            At_data1 = ""
+
+            Reset T1tout
+            T1cntr = 0
+            T1wait = 20
+            Set T1ini
+            Do
+               Reset Watchdog
+            Loop Until At_loop <> "" Or At_resp <> "" Or At_data <> "" Or At_data1 <> "" Or T1tout = 1 Or Sendok = 1       ' Or Sendfail = 1
+            Reset T1tout
+            Print #1 , "1: " ; At_loop
+            Print #1 , "2: " ; At_resp
+            Print #1 , "3: " ; At_data
+            Print #1 , "4: " ; At_data1
+
+            Print #1 , "Espera respuesta server"
+
+            Reset T1tout
+            T1cntr = 0
+            T1wait = 6
+            Set T1ini
+            Do
+            Loop Until Respsrvok = 1 Or T1tout = 1
+            Print #1 , "FIN ESPERA"
+
+            Reset T1tout
+            T1cntr = 0
+            T1wait = 10
+            Set T1ini
+            Print #1 , "Close"
+            Reset Closeok
+            Call Atcmdsnd( "AT+CIPCLOSE" , 100)
+            Call Espera(100)
+
+            Do
+            Loop Until Closeok = 1 Or T1tout = 1         'Or Dcdgsm = 1
+            Print #1 , "1: " ; At_loop
+            Print #1 , "2: " ; At_resp
+            Print #1 , "3: " ; At_data
+            Print #1 , "4: " ; At_data1
+
+            Print #1 , "Bye"
+            If Closeok = 1 Then
+               Print #1 , "CLOSE OK"
+            Else
+               Reset T1tout
+               Print #1 , "NO CLOSE OK rx"
+               Reset T1tout
+               T1cntr = 0
+               T1wait = 10
+               Set T1ini
+               Reset Shutok
+               Do
+                  Call Atcmdsnd( "AT+CIPSHUT" , 100)
+                  Call Espera(100)
+               Loop Until Shutok = 1 Or T1tout = 1    'Or Dcdgsm = 1
+               Print #1 , "1: " ; At_loop
+               Print #1 , "2: " ; At_resp
+               Print #1 , "3: " ; At_data
+               Print #1 , "4: " ; At_data1
+            End If
+            If Ptrrd > 1 Then
+               Print #1 , "BUFRD"
+               For Tmpw = 1 To Ptrrd
+                  Print #1 , Chr(bufrd(tmpw));
+               Next
+               Print #1,
+               Print #1 , "%FINBUFRD%"
+               Tmpw = Instr(bufferrx , "Status: 200 OK")
+               If Tmpw > 0 Then
+                  Print #1 , "TS WR OK"
+                  Cntrerrts = 0
+               Else
+                  Incr Cntrerrts
+                  If Cntrerrts = 6 Then
+                     Set Iniapagarmdm
+
+                  End If
+               End If
+            End If
+            Ptrrd = 0
+            Reset Newrd
+            Set Txok
+            Cntracterr = 0
+            Cntrerrtx = 0
+            Reset T1ini
+            Estado_led = 1
+         Else
+            Print #1 , "Error TX"
+            Incr Cntrerrtx
+         End If
+      Else
+         Print #1 , "No se pudo establecer conexión con el servidor"
+         Print #1 , "Reset sesion IP"
+         Reset T1tout
+         Incr Cntrerrtx
+         T1cntr = 0
+         T1wait = 10
+         Set T1ini
+         Reset Shutok
+         Reset Cifsrok
+         Do
+            Call Atcmdsnd( "AT+CIPSHUT" , 100)
+            Call Espera(100)
+         Loop Until Shutok = 1 Or T1tout = 1    'Or Dcdgsm = 1
+         Print #1 , "1: " ; At_loop
+         Print #1 , "2: " ; At_resp
+         Print #1 , "3: " ; At_data
+         Print #1 , "4: " ; At_data1
+         Estado_led = 2
+      End If
    End If
 End Sub
 
